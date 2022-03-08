@@ -1,0 +1,417 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{amsmath,amsfonts,amssymb,amsthm,commath,dsfont}
+\usepackage{enumitem}
+\usepackage{framed}
+\usepackage{xspace}
+\usepackage{microtype}
+\usepackage{float}
+\usepackage[round]{natbib}
+\bibliographystyle{plainnat}
+\usepackage{cleveref}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage[breakable]{tcolorbox}
+\tcbset{breakable}
+\usepackage{mathtools}
+\usepackage{caption}
+\usepackage{subcaption}
+\def\b1{\boldsymbol{1}}
+
+\newcommand{\colbar}{\rule[-3mm]{.3mm}{1.5em}}
+\newcommand{\rowbar}{\rule[.5ex]{1.5em}{.3mm}}
+\DeclareMathOperator{\rank}{rank}
+\def\balpha{\boldsymbol{\alpha}}
+% following loops stolen from djhsu
+\def\ddefloop#1{\ifx\ddefloop#1\else\ddef{#1}\expandafter\ddefloop\fi}
+% \bbA, \bbB, ...
+\def\ddef#1{\expandafter\def\csname bb#1\endcsname{\ensuremath{\mathbb{#1}}}}
+\ddefloop ABCDEFGHIJKLMNOPQRSTUVWXYZ\ddefloop
+
+% \cA, \cB, ...
+\def\ddef#1{\expandafter\def\csname c#1\endcsname{\ensuremath{\mathcal{#1}}}}
+\ddefloop ABCDEFGHIJKLMNOPQRSTUVWXYZ\ddefloop
+
+% \vA, \vB, ..., \va, \vb, ...
+\def\ddef#1{\expandafter\def\csname v#1\endcsname{\ensuremath{\boldsymbol{#1}}}}
+\ddefloop ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\ddefloop
+
+% \valpha, \vbeta, ...,  \vGamma, \vDelta, ...,
+\def\ddef#1{\expandafter\def\csname v#1\endcsname{\ensuremath{\boldsymbol{\csname #1\endcsname}}}}
+\ddefloop {alpha}{beta}{gamma}{delta}{epsilon}{varepsilon}{zeta}{eta}{theta}{vartheta}{iota}{kappa}{lambda}{mu}{nu}{xi}{pi}{varpi}{rho}{varrho}{sigma}{varsigma}{tau}{upsilon}{phi}{varphi}{chi}{psi}{omega}{Gamma}{Delta}{Theta}{Lambda}{Xi}{Pi}{Sigma}{varSigma}{Upsilon}{Phi}{Psi}{Omega}{ell}\ddefloop
+
+\newcommand\T{{\scriptscriptstyle\mathsf{T}}}
+\def\diag{\textup{diag}}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\def\SPAN{\textup{span}}
+\def\tu{\textup{u}}
+\def\R{\mathbb{R}}
+\def\E{\mathbb{E}}
+\def\Z{\mathbb{Z}}
+\def\be{\mathbf{e}}
+\def\nf{\nabla f}
+\def\veps{\varepsilon}
+\def\cl{\textup{cl}}
+\def\inte{\textup{int}}
+\def\dom{\textup{dom}}
+\def\Rad{\textup{Rad}}
+\def\lsq{\ell_{\textup{sq}}}
+\def\hcR{\widehat{\cR}}
+\def\hcRl{\hcR_\ell}
+\def\cRl{\cR_\ell}
+\def\hcE{\widehat{\cE}}
+\def\cEl{\cE_\ell}
+\def\hcEl{\hcE_\ell}
+\def\eps{\epsilon}
+\def\1{\mathds{1}}
+\newcommand{\red}[1]{{\color{red} #1}}
+\newcommand{\blue}[1]{{\color{blue} #1}}
+\def\srelu{\sigma_{\textup{r}}}
+\def\vsrelu{\vec{\sigma_{\textup{r}}}}
+\def\vol{\textup{vol}}
+\def\sr{\sigma_r}
+
+\newcommand{\ip}[2]{\left\langle #1, #2 \right \rangle}
+\newcommand{\mjt}[1]{{\color{blue}\emph{\textbf{[MJT:}~#1~\textbf{]}}}}
+
+\newtheorem{fact}{Fact}
+\newtheorem{lemma}{Lemma}
+\newtheorem{claim}{Claim}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{condition}{Condition}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+\newtheorem{example}{Example}
+
+\newenvironment{Q}
+{%
+\clearpage
+\item
+}
+{%
+\phantom{s}%lol doesn't work
+\bigskip%
+\noindent\textbf{Solution.}
+}
+
+\title{CS 446 / ECE 449 --- Homework 2}
+\author{\emph{your NetID here}}
+\date{Version 1.0}
+
+\begin{document}
+\maketitle
+
+\noindent\textbf{Instructions.}
+\begin{itemize}
+  \item
+    Homework is due \textbf{Tuesday, February 22, at noon CST}; no late homework accepted.
+
+  \item
+    Everyone must submit individually on Gradescope under \texttt{hw2} and \texttt{hw2code}.
+
+  \item
+    The ``written'' submission at \texttt{hw2} \textbf{must be typed}, and submitted in
+    any format Gradescope accepts (to be safe, submit a PDF).  You may use \LaTeX, Markdown,
+    Google Docs, MS Word, whatever you like; but it must be typed!
+
+  \item
+    When submitting at \texttt{hw2}, Gradescope will ask you to select pages
+    for each problem; please do this precisely!
+
+  \item
+    Please make sure your NetID is clear and large on the first page of the homework.
+
+  \item
+    Your solution \textbf{must} be written in your own words.
+    Please see the course webpage for full academic integrity information.
+    Briefly, you may have high-level discussions with at most 3 classmates,
+    whose NetIDs you should place on the first page of your solutions,
+    and you should cite any external reference you use; despite all this,
+    your solution must be written in your own words.
+
+    \item
+      We reserve the right to reduce the auto-graded score for
+      \texttt{hw2code} if we detect funny business (e.g., your solution
+      lacks any algorithm and hard-codes answers you obtained from
+      someone else, or simply via trial-and-error with the autograder).
+
+    \item
+      Coding problems come with suggested ``library routines''; we include these to reduce
+      your time fishing around APIs, but you are free to use other APIs.
+
+    \item
+      When submitting to \texttt{hw2code}, only upload the two python files \texttt{hw2.py} and \texttt{hw2\_utils.py}. Don't upload a zip file or additional files.
+    
+\end{itemize}
+
+\noindent\textbf{Version history.}
+\begin{enumerate}
+    \item[1.0.] Initial version.
+\end{enumerate}
+
+\begin{enumerate}[font={\Large\bfseries},left=0pt]
+
+\begin{Q}
+  \textbf{\Large{}SVM with Biases.}
+
+  This problem is about SVMs over $\R^d$ with linearly separable data
+  (i.e., the hard margin SVM).
+
+  Our formulation of SVM required separators to pass through the origin, which 
+  does not provide a geometrically pleasing notion of maximum margin direction.
+
+  A first fix is provided by lecture 4: by appending a $1$ to the inputs,
+  we obtain the convex program
+  \begin{align*}
+    \min_{\vu}\quad&\frac 1 2 \|\vu\|^2\\
+    \textrm{subject to}\quad&\vu\in\R^{d+1}\\
+                            &y_i \sbr[1]{\begin{smallmatrix}\vx_i\\1\end{smallmatrix}}^\T \vu
+                            \geq 1\qquad\forall i,
+  \end{align*}
+  and let $\bar\vu$ denote the optimal solution to this program.
+
+  A second standard fix is to incorporate the bias directly into the optimization problem:
+  \begin{align*}
+    \min_{\vv,b}\quad&\frac 1 2 \|\vv\|^2\\
+    \textrm{subject to}\quad&\vv\in\R^{d}, b\in\R\\
+                            &y_i (\vv^\T \vx_i + b) \geq 1\qquad\forall i,
+  \end{align*}
+  and let $(\bar\vv,\bar b) \in \R^d \times \R$ denote an optimal solution to this program.
+  This second version is standard, but we do not use it in lecture for various reasons.
+
+  \begin{enumerate}
+    \item
+      In lecture, we stated that the first formulation is a \emph{convex program}
+      (formally defined in lecture 5).
+      Show that the second formulation is also a convex program.
+
+    \item
+      Suppose there is only one datapoint: $\vx_1 = \ve_1$, the first standard basis vector, 
+      with label $y_1 = +1$.
+      The first formulation will have a unique solution $\bar\vu$, as discussed in lecture.
+      Show that the second formulation does not have a unique solution.
+
+    \item
+      Let's add another datapoint: $\vx_2 = -a\ve_1$ for some $a\geq 3$, with label $y_2 = -1$.
+      Now that we have two data points, both of the convex programs now have two constraints.
+      Write out the explicit constraints to the first convex program.
+
+    \item
+      Using these two constraints, show that the first coordinate
+      $\bar u_1$ of the optimal solution $\bar \vu$ satisfies $\bar u_1 \geq \frac{2}{a+1}$.
+
+    \item
+      Using parts (c) and (d), find optimal solutions $\bar\vu$ and $(\bar\vv,\bar b)$, and prove they are in fact optimal.
+
+      \textbf{Hint:} If you are stuck, first try the case $d=1$. Then study what happens for $d=2,d=3,\ldots$
+
+      \textbf{Hint:} $(\bar\vv,\bar b)$ will be unique.
+
+    \item
+      Now we will consider the behavior of $\bar\vu$ and $\bar\vv$ as $a$ increases;
+      to this end, write $\bar\vu_a$ and $\bar\vv_a$, and consider $a\to\infty$.
+      Determine and formally prove the limiting behavior of
+      $\lim_{a\to\infty}\frac 1 2 \|\bar\vu_a\|^2$ and $\lim_{a\to\infty}\frac 1 2 \|\bar\vv_a\|^2$.
+
+      \textbf{Hint:} The two limits will not be equal.
+
+    \item
+      Between the two versions of SVM with bias, which do you prefer?
+      Any answer which contains at least one complete sentence will receive full credit.
+
+      \textbf{Remark:} Initially it may have seemed that both optimization problems have
+      the same solutions; the purpose of this problem was to highlight that small differences
+      in machine learning methods can lead to observably different performance.
+  \end{enumerate}
+\end{Q}
+  
+\begin{Q}
+    \textbf{\Large SVM Implementation.}
+    
+    Recall that the dual problem of an SVM is
+    \begin{align*}
+        \max_{\balpha\in\cC}\sum_{i=1}^{n}\alpha_i-\frac{1}{2}\sum_{i,j=1}^{n}\alpha_i\alpha_jy_iy_jK(\vx_i,\vx_j),
+    \end{align*}
+    where the domain $\cC=[0,\infty)^n=\{\balpha:\alpha_i\ge0\}$ for a  hard-margin SVM, and $\cC=[0,C]^n=\{\balpha:0\le\alpha_i\le C\}$ for a soft-margin SVM. Equivalently, we can frame this as the minimization problem
+    \begin{align*}
+        \min_{\balpha\in\cC}f(\balpha):=\frac{1}{2}\sum_{i,j=1}^{n}\alpha_i\alpha_jy_iy_jK(\vx_i,\vx_j)-\sum_{i=1}^{n}\alpha_i.
+    \end{align*}
+    This can be solved by projected gradient descent, which starts from some $\balpha_0\in\cC$ (e.g., $\boldsymbol{0}$) and updates via
+    \begin{align*}
+        \balpha_{t+1}=\Pi_{\cC}\sbr{\balpha_t-\eta\nabla f(\balpha_t)},
+    \end{align*}
+    where $\Pi_{\cC}[\balpha]$ is the \emph{projection} of $\balpha$ onto $\cC$, defined as the closest point to $\balpha$ in $\cC$:
+    \begin{align*}
+        \Pi_{\cC}[\balpha]:=\argmin_{\balpha'\in\cC}\|\balpha'-\balpha\|_2.
+    \end{align*}
+    If $\cC$ is convex, the projection is uniquely defined.
+
+    \begin{enumerate}
+        \item Prove that
+        \begin{align*}
+            \del{\Pi_{[0,\infty)^n}[\balpha]}_i=\max\{\alpha_i,0\},
+        \end{align*}
+        and
+        \begin{align*}
+            \del{\Pi_{[0,C]^n}[\balpha]}_i=\min\{\max\{0,\alpha_i\},C\}.
+        \end{align*}
+        
+        \textbf{Hint:} Show that the $i$th component of any other $\valpha' \in \cC$ is further from the $i$th component of $\valpha$ than the $i$th component of the projection is. Specifically, show that $\abs{\alpha'_i - \alpha_i} \ge \abs{\max\cbr{0, \alpha_i} - \alpha_i}$ for $\valpha' \in [0,\infty)^n$ and that $\abs{\alpha'_i - \alpha_i} \ge \abs{\min\cbr{\max\cbr{0, \alpha_i}, C} - \alpha_i}$ for $\valpha' \in [0,C]^n$.
+
+        \item Implement an \texttt{svm\_solver()}, using projected gradient descent formulated as above. Initialize your $\valpha$ to zeros. See the docstrings in \texttt{hw2.py} for details.
+        
+    \textbf{Remark:} Consider using the \texttt{.backward()} function in pytorch. However, then you may have to use in-place operations like \texttt{clamp\_()}, otherwise the gradient information is destroyed.
+    
+    \textbf{Library routines:} \texttt{torch.outer, torch.clamp, torch.autograd.backward, torch.tensor(..., requires\_grad=True), with torch.no\_grad():, torch.tensor.grad.zero\_, torch.tensor.detach.}
+
+        \item Implement an \texttt{svm\_predictor()}, using an optimal dual solution, the training set, and an input. See the docstrings in \texttt{hw2.py} for details.
+        
+        \textbf{Library routines:} \texttt{torch.empty.}
+
+        \item On the area $[-5,5]\times[-5,5]$, plot the contour lines of the following kernel SVMs, trained on the XOR data. Different kernels and the XOR data are provided in \texttt{hw2\_utils.py}. Learning rate 0.1 and 10000 steps should be enough. To draw the contour lines, you can use \texttt{hw2\_utils.svm\_contour()}.
+        \begin{itemize}
+            \item The polynomial kernel with degree $2$.
+            \item The RBF kernel with $\sigma=1$.
+            \item The RBF kernel with $\sigma=2$.
+            \item The RBF kernel with $\sigma=4$.
+        \end{itemize}
+        Include these four plots in your written submission.
+    \end{enumerate}
+\end{Q}
+    
+\begin{Q}
+    \textbf{\Large Neural Networks for Emotion Classification}
+    
+    In this problem you will build a single-layer neural network that classifies pictures into one of six categories: anger, disgusted, happy, maudlin, fear, and surprise.  The CAFE \footnote{Inspiration for this problem from Garrison Cottrell's neural networks course. See \cite{cafe} for more info on the CAFE dataset.} dataset included in this homework's zip file provides a set of grayscale facial images expressing the described emotions. This will also serve as an introduction to writing your own neural networks in PyTorch!  Consider the single layer neural network below
+    \begin{equation*}
+        \vx \mapsto  \sigma(\vW \vx  + \vb),
+    \end{equation*}
+    where $\sigma$ is the softmax activation and we use cross entropy loss to train the network.
+    
+    \begin{enumerate}
+        \item Implement your network in the class CAFENet.  You
+            will need to modify the \texttt{\_\_init\_\_} and \texttt{forward} methods. Due to numerical issues, do not include an explicit softmax layer in your network. Instead, your implementation should output the raw logits (meaning $\vW \vx + \vb$); in part (b), the network will be fit to data with \texttt{torch.nn.CrossEntropyLoss}, which implicitly applies a softmax as discussed in lecture. Refer to \texttt{IMAGE\_DIMS}, \texttt{load\_cafe}, and \texttt{get\_cafe\_data} in \texttt{hw2\_utils.py} for how the images and labels will be passed to the network as tensors.
+            
+            \textbf{Library routines:} \texttt{torch.nn.Linear, torch.nn.Module.forward.}
+            
+        \item Implement \texttt{fit} to train the input network for \texttt{n\_epochs} epochs. Use cross entropy loss and an Adam optimizer.
+        
+        \textbf{Library routines:} \texttt{torch.nn.Module.forward, torch.nn.\_Loss.backward, torch.optim.Adam,}
+        
+        \texttt{torch.optim.Optimizer.step, torch.optim.Optimizer.zero\_grad, torch.nn.CrossEntropyLoss.}
+        
+        \item Implement and run the \texttt{plot\_cafe\_loss} function.
+          Specifically, 
+          use \texttt{hw2\_utils.get\_cafe\_data()} to load the training set,
+          then train a CAFENet via your \texttt{fit} function for 201 epochs.
+          Plot the empirical risk (in terms of cross entropy loss) across these first 201 epochs,
+          and include the resulting plot in your written handin.
+          Lastly, use \texttt{torch.save} to save your model in order to use it in the next two problem parts.
+            
+        \textbf{Library routines:} \texttt{plt.plot, torch.save.}
+
+        \item Let's see how well our model predicts labels.
+            We will use a confusion matrix to visualize how well it does for each category.
+            Implement \texttt{print\_confusion\_matrix} to print out two confusion matrices for your model,
+            one on the training set and one on the test set.
+            Use \texttt{hw2\_utils.get\_cafe\_data("test")} to load the test set.
+            Include both matrices in your writeup,
+            along with 1-3 sentences discussing differences in the matrices and what
+            might cause them.
+            
+        \textbf{Library routines:} \texttt{torch.load, torch.argmax, sklearn.metrics.confusion\_matrix.}
+            
+        \item Now let's visualize the model's weights by implementing the \texttt{visualize\_weights} method. For each of the 91,200-dimensional weights of your CAFENet's six output nodes, linearly map them to the grayscale range [0, 255] by performing the following transformations:
+        \begin{enumerate}
+            \item Compute the minimum and maximum weights across all six output nodes, denoted \texttt{min\_weight, max\_weight} respectively.
+            \item Transform the weights \texttt{w} by \texttt{w = (w - min\_weight) * 255 / (max\_weight - min\_weight)} to linearly map \texttt{w} into the range [0, 255].
+            \item Cast the weights to integers.
+        \end{enumerate}
+        Then, reshape the weights to the image dimensions \texttt{380 x 240} and plot them in grayscale. Include all six plots in your writeup. What do you see? Why might the weights appear this way?
+        
+        \textbf{Library routines:} \texttt{torch.load, torch.nn.Module.parameters, torch.nn.tensor.min,}
+        
+        \texttt{torch.nn.tensor.max, torch.nn.tensor.int, torch.nn.tensor.reshape,}
+        
+        \texttt{torch.tensor.detach, plt.imshow(..., cmap=`gray').}
+        
+    \end{enumerate}
+    \textbf{Note:} In practice, for simple neural networks like this we would use \texttt{torch.nn.Sequential}.
+    
+\end{Q}
+ 
+   \begin{Q}
+    \textbf{\Large Shallow Network Random Initialization.}
+
+    Consider a 2-layer network
+    \begin{align*}
+        f(\vx;\vW,\vv)=\sum_{j=1}^{m}v_j\sigma\del{\langle\vw_j,\vx\rangle},
+    \end{align*}
+    where $\vx\in \mathbb{R}^d$, $\vW\in \mathbb{R}^{m\times d}$ with rows $\vw_j^\top$, and $\vv\in \mathbb{R}^m$. For simplicity, the network has a single output, and bias terms are omitted.
+
+    Given a data example $(\vx,y)$ and a loss function $\ell$, consider the empirical risk
+    \begin{align*}
+        \hcR(\vW,\vv)=\ell\del{f(\vx;\vW,\vv),y}.
+    \end{align*}
+    Only a single data example will be considered in this problem;
+    the same analysis extends to multiple examples by taking averages.
+
+    \begin{enumerate}
+        \item For each $1\le j\le m$, derive $\partial\hcR/\partial v_j$ and $\partial\hcR/\partial \vw_j$. Note that the first is a derivative with respect to a scalar (so the answer should be a scalar), and the second is a derivative with respect to a vector (so the answer should be a vector).
+
+        \item Consider gradient descent which starts from some $\vW^{(0)}$ and $\vv^{(0)}$, and at step $t\ge0$, updates the weights for each $1\le j\le m$ as follows:
+        \begin{align*}
+            \vw_j^{(t+1)}=\vw_j^{(t)}-\eta \frac{\partial\hcR}{\partial \vw_j^{(t)}},\qquad \mathrm{and}\qquad v_j^{(t+1)}=v_j^{(t)}-\eta \frac{\partial\hcR}{\partial v_j^{(t)}}.
+        \end{align*}
+
+        Suppose there exist two hidden units $p,q\in\{1,2,\ldots,m\}$ and $t$ such that $\vw_p^{(t)}=\vw_q^{(t)}$ and $v_p^{(t)}=v_q^{(t)}$.
+        Show that $\vw_p^{(t+1)}=\vw_q^{(t+1)}$ and $v_p^{(t+1)}=v_q^{(t+1)}$.
+
+        \item 
+        Suppose there exist two hidden units $p,q\in\{1,2,\ldots,m\}$ such that $\vw_p^{(0)}=\vw_q^{(0)}$ and $v_p^{(0)}=v_q^{(0)}$.
+        Using induction, conclude that for any step $t\ge0$, it holds that $\vw_p^{(t)}=\vw_q^{(t)}$ and $v_p^{(t)}=v_q^{(t)}$.
+
+        \textbf{Remark:} As a result, if the neural network is initialized symmetrically, then such a symmetry may persist during gradient descent, and thus the representation power of the network will be limited.
+    \end{enumerate}
+    Random initialization is a good way to break symmetry. Moreover, proper random initialization also preserves the squared norm of the input, as formalized below.
+
+    Consider the identity activation $\sigma(z)=z$. For each $1\le j\le m$ and $1\le k\le d$, initialize $w_{j,k}^{(0)}\sim\cN(0,1/m)$ (i.e., normal distribution with mean $0$ and variance $1/m$).
+    We will show that
+    \begin{align*}
+        \mathbb{E}\sbr[2]{\,\enVert[1]{\vW^{(0)}\vx}_2^2\,}=\|\vx\|_2^2.
+    \end{align*}
+    For convenience, define $\vW := \vW^{(0)}$.
+
+    \begin{enumerate}[resume]
+      \item Let $\vw^\top$ be an arbitrary row of $\vW$. Prove that
+        \begin{align*}
+          \bbE\sbr{ (\vw^\top \vx)^2 } = \bbE\sbr[2]{ \sum_{i=1}^d w_i^2 x_i^2 + \sum_{\substack{i,j=1\\i\neq j}}^d w_iw_jx_ix_j}.
+        \end{align*}
+      
+      \item Using linearity of expectation, prove that
+        \begin{align*}
+          \bbE\sbr[2]{ \sum_{i=1}^d w_i^2 x_i^2 + \sum_{\substack{i,j=1\\i\neq j}}^d w_iw_jx_ix_j} = \frac 1 m \|\vx\|^2.
+        \end{align*}
+      \textbf{Hint:} It may be helpful to recall that for independent random variables $X,Y,$ we have $\bbE[XY] = \bbE[X] \bbE[Y]$ and $\operatorname{Var}(X) = \bbE[X^2] - (\bbE[X])^2$.
+      \item Using parts (d) and (e), prove that
+        \begin{align*}
+          \bbE\sbr{ \|\vW\vx\|^2 } = \|\vx\|^2.
+        \end{align*}
+      \textbf{Remark:} A similar property holds with the ReLU activation.
+    \end{enumerate}
+
+\end{Q}
+\end{enumerate}
+
+\newpage
+\bibliography{hw2}
+\end{document}
